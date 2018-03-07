@@ -27,7 +27,8 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 
 Downloading the zip file using the provided URL
 
-```{r}
+
+```r
 #fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 #download.file(fileUrl, destfile = paste0(getwd(), '/repdata%2Fdata%2Factivity.zip'), method = "curl")
 #unzip("repdata%2Fdata%2Factivity.zip",exdir = "data")
@@ -35,36 +36,79 @@ Downloading the zip file using the provided URL
 
 ### Adding required libraries
 
-```{r results='hide'}
+
+```r
 library(ggplot2)
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
 ```
 
 1. Load the data (i.e. 𝚛𝚎𝚊𝚍.𝚌𝚜𝚟())
 
 Unzipping the downloaded zip files gives a .csv file
 
-```{r results='hide'}
+
+```r
 activity <- read.csv("data/activity.csv")
 ```
 
 To see what data looks like.
 
-```{r}
+
+```r
 head(activity)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
 ```
 
 To know more about the data in various columns and range of values associated with them.
 
-```{r}
+
+```r
 summary(activity)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
 ```
 
 2. Process/transform the data (if necessary) into a format suitable for your analysis
 
 There are some NA values which are needed to be omitted so that they do not interfere in our analysis
 
-```{r}
+
+```r
 activityComplete <- na.omit(activity)
 ```
 
@@ -74,46 +118,88 @@ This problem can be answered by few steps which are mentioned below.
 
 1. Calculate the total number of steps taken per day
 
-```{r}
+
+```r
 activityDay <- group_by(activityComplete, date)
 activityDay <- summarise(activityDay, steps = sum(steps))
 ```
 
 2. If you do not understand the difference between a histogram and a barplot, research the difference between them. Make a histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 qplot(steps, data = activityDay)
 ```
 
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 3. Calculate and report the mean and median of the total number of steps taken per day
 
-```{r}
+
+```r
 mean(activityDay$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(activityDay$steps)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
 1. Make a time series plot (i.e. 𝚝𝚢𝚙𝚎 = "𝚕") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r}
+
+```r
 activityInterval <- group_by(activityComplete, interval)
 activityInterval <- summarise(activityInterval, steps = mean(steps))
 ```
 
 Plotting the graph with interval as x-axis and average daily steps as y-axis
 
-```{r}
+
+```r
 ggplot(activityInterval, aes(interval, steps)) + geom_line(color = 'blue')
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 Now we will look for the row in the activityInterval for which steps is equal to the maximum number of steps.
 
-```{r}
+
+```r
 maximum <- activityInterval$steps
 activityInterval[activityInterval$steps == maximum,]
+```
+
+```
+## # A tibble: 288 x 2
+##    interval  steps
+##       <int>  <dbl>
+##  1        0 1.72  
+##  2        5 0.340 
+##  3       10 0.132 
+##  4       15 0.151 
+##  5       20 0.0755
+##  6       25 2.09  
+##  7       30 0.528 
+##  8       35 0.868 
+##  9       40 0     
+## 10       45 1.47  
+## # ... with 278 more rows
 ```
 
 ## Imputing missing values
@@ -124,15 +210,21 @@ There are some observations for which values of steps coded as NA. Existence of 
 
 Total number of rows which have NAs can be calculated by taking the difference between the number of rows of activity and activityComplete
 
-```{r}
+
+```r
 nrow(activity) - nrow(activityComplete)
+```
+
+```
+## [1] 2304
 ```
 
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 
 We can replace missing values with the mean number of steps for each interval across all of the days. activityInterval has these means, therfore, we will merge activityInterval with raw data that is, activity.
 
-```{r}
+
+```r
 names(activityInterval)[2] <- "meanSteps"
 activityImpute <- merge(activity, activityInterval)
 ```
@@ -141,7 +233,8 @@ activityImpute <- merge(activity, activityInterval)
 
 NA is now replaced with the mean number of steps for that interval.
 
-```{r}
+
+```r
 activityImpute$steps[is.na(activityImpute$steps)] <- activityImpute$meanSteps[is.na(activityImpute$steps)]
 ```
 
@@ -149,24 +242,42 @@ activityImpute$steps[is.na(activityImpute$steps)] <- activityImpute$meanSteps[is
 
 Creating a dataset with total steps per dat using the imputed data.
 
-```{r}
+
+```r
 activityImpute_1 <- group_by(activityImpute, date)
 activityImpute_1 <- summarise(activityImpute_1, steps = sum(steps))
 ```
 
 Generating the histogram
 
-```{r}
+
+```r
 qplot(steps, data = activityImpute_1)
 ```
 
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+
 Summary of statistics
 
-```{r}
+
+```r
 mean(activityImpute_1$steps)
 ```
-```{r}
+
+```
+## [1] 10766.19
+```
+
+```r
 median(activityImpute_1$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 Mean remains unaffected by simple data imputation but the median got smaller.
@@ -179,7 +290,8 @@ For this part the 𝚠𝚎𝚎𝚔𝚍𝚊𝚢𝚜() function may be of some hel
 
 Firstly, we will read data as a table and then convert date into POSIXct and then add Day of Week to record day associated to a date.
 
-```{r}
+
+```r
 activity <- data.table::fread(input = "data/activity.csv")
 activity[, date := as.POSIXct(date, format = "%Y-%m-%d")]
 activity[, `Day of Week`:= weekdays(x = date)]
@@ -189,12 +301,29 @@ activity[, `weekday or weekend` := as.factor(`weekday or weekend`)]
 head(activity, 10)
 ```
 
+```
+##     steps       date interval Day of Week weekday or weekend
+##  1:    NA 2012-10-01        0      Monday            weekday
+##  2:    NA 2012-10-01        5      Monday            weekday
+##  3:    NA 2012-10-01       10      Monday            weekday
+##  4:    NA 2012-10-01       15      Monday            weekday
+##  5:    NA 2012-10-01       20      Monday            weekday
+##  6:    NA 2012-10-01       25      Monday            weekday
+##  7:    NA 2012-10-01       30      Monday            weekday
+##  8:    NA 2012-10-01       35      Monday            weekday
+##  9:    NA 2012-10-01       40      Monday            weekday
+## 10:    NA 2012-10-01       45      Monday            weekday
+```
+
 2. Make a panel plot containing a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
 Secondly, plotting the graph.
 
-```{r}
+
+```r
 activity[is.na(steps), "steps"] <- activity[, c(lapply(.SD, median, na.rm = TRUE)), .SDcols = c("steps")]
 Interval <- activity[, c(lapply(.SD, mean, na.rm = TRUE)), .SDcols = c("steps"), by = .(interval, `weekday or weekend`)] 
 ggplot(Interval , aes(x = interval , y = steps, color=`weekday or weekend`)) + geom_line() + labs(title = "Avg. Daily Steps by Weektype", x = "Interval", y = "No. of Steps") + facet_wrap(~`weekday or weekend` , ncol = 1, nrow=2)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
