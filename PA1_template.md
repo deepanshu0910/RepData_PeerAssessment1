@@ -181,25 +181,15 @@ Now we will look for the row in the activityInterval for which steps is equal to
 
 
 ```r
-maximum <- activityInterval$steps
+maximum <- max(activityInterval$steps)
 activityInterval[activityInterval$steps == maximum,]
 ```
 
 ```
-## # A tibble: 288 x 2
-##    interval  steps
-##       <int>  <dbl>
-##  1        0 1.72  
-##  2        5 0.340 
-##  3       10 0.132 
-##  4       15 0.151 
-##  5       20 0.0755
-##  6       25 2.09  
-##  7       30 0.528 
-##  8       35 0.868 
-##  9       40 0     
-## 10       45 1.47  
-## # ... with 278 more rows
+## # A tibble: 1 x 2
+##   interval steps
+##      <int> <dbl>
+## 1      835   206
 ```
 
 ## Imputing missing values

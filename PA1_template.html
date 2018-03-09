@@ -220,22 +220,12 @@ activityInterval &lt;- summarise(activityInterval, steps = mean(steps))</code></
 <li>Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?</li>
 </ol>
 <p>Now we will look for the row in the activityInterval for which steps is equal to the maximum number of steps.</p>
-<pre class="r"><code>maximum &lt;- activityInterval$steps
+<pre class="r"><code>maximum &lt;- max(activityInterval$steps)
 activityInterval[activityInterval$steps == maximum,]</code></pre>
-<pre><code>## # A tibble: 288 x 2
-##    interval  steps
-##       &lt;int&gt;  &lt;dbl&gt;
-##  1        0 1.72  
-##  2        5 0.340 
-##  3       10 0.132 
-##  4       15 0.151 
-##  5       20 0.0755
-##  6       25 2.09  
-##  7       30 0.528 
-##  8       35 0.868 
-##  9       40 0     
-## 10       45 1.47  
-## # ... with 278 more rows</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##   interval steps
+##      &lt;int&gt; &lt;dbl&gt;
+## 1      835   206</code></pre>
 </div>
 <div id="imputing-missing-values" class="section level2">
 <h2>Imputing missing values</h2>

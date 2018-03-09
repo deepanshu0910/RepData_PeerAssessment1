@@ -112,7 +112,7 @@ ggplot(activityInterval, aes(interval, steps)) + geom_line(color = 'blue')
 Now we will look for the row in the activityInterval for which steps is equal to the maximum number of steps.
 
 ```{r}
-maximum <- activityInterval$steps
+maximum <- max(activityInterval$steps)
 activityInterval[activityInterval$steps == maximum,]
 ```
 
